@@ -24,11 +24,11 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "id_provider")
-    private Provider provider;
+    private User provider;
 
     @ManyToOne
     @JoinColumn(name = "id_customer")
-    private Customer customer;
+    private User customer;
 
     private LocalTime startTime;
 
@@ -40,6 +40,6 @@ public class Appointment {
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
-    @OneToMany(mappedBy = "appointment")
-    private List<AppointmentMessage> messages;
+//    @OneToMany(mappedBy = "appointment")
+//    private List<AppointmentMessage> messages;
 }

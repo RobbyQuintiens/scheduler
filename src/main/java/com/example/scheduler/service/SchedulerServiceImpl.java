@@ -78,6 +78,12 @@ public class SchedulerServiceImpl implements SchedulerService {
         schedulerRepository.save(appointment);
     }
 
+    @Override
+    public void updateStatus(Appointment appointment, AppointmentStatus status) {
+        appointment.setStatus(status);
+        schedulerRepository.save(appointment);
+    }
+
     private Customer createCustomer(User user) {
         Customer customer = new Customer();
         customer.setId(user.getId());

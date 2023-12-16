@@ -1,5 +1,6 @@
 package com.example.scheduler.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,10 +24,10 @@ public class AppointmentMessage {
 
     private String message;
 
-    @ManyToOne
-    private User author;
+//    @ManyToOne
+//    private User author;
 
-    @ManyToOne
-    @JoinColumn(name = "id_appointment")
-    private Appointment appointment;
+//    @ManyToOne
+//    @JoinColumn(name = "id_appointment")
+//    private Appointment appointment;
 }

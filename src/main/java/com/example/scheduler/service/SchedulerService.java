@@ -19,4 +19,5 @@ public interface SchedulerService {
     public List<Appointment> getAppointmentsByProviderIdByStatus(int userId, AppointmentStatus status);
     public void createAppointment(AppointmentDto appointmentDto);
     public void updateAppointment(Appointment appointment);
+    public void updateStatus(Appointment appointment, AppointmentStatus status);
 }

@@ -15,7 +15,7 @@ public class UserDetailsFilter {
     public static final String AUTH_TOKEN = "Authorization";
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsFilter.class);
 
-    public String getUserInfo(HttpHeaders requestHeaders, String info) {
+    public static String getUserInfo(HttpHeaders requestHeaders, String info) {
         if (requestHeaders.get(AUTH_TOKEN) != null) {
             List<String> header = requestHeaders.get(AUTH_TOKEN);
             assert header != null;
@@ -31,7 +31,7 @@ public class UserDetailsFilter {
         return info;
     }
 
-    private JSONObject decodeJWT(String JWTToken) {
+    private static JSONObject decodeJWT(String JWTToken) {
         String[] splitString = JWTToken.split("\\.");
         String base64EncodedBody = splitString[1];
         Base64 base64Url = new Base64(true);
