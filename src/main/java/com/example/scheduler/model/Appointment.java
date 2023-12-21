@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,9 +25,8 @@ public class Appointment {
     @JoinColumn(name = "id_provider")
     private User provider;
 
-    @ManyToOne
-    @JoinColumn(name = "id_customer")
-    private User customer;
+    @Column(name = "id_customer")
+    private int customerId;
 
     private LocalTime startTime;
 

@@ -1,9 +1,12 @@
 package com.example.scheduler.service;
 
 import com.example.scheduler.dto.AppointmentDto;
+import com.example.scheduler.dto.CustomerDto;
 import com.example.scheduler.exception.AppointmentNotFoundException;
-import com.example.scheduler.exception.UserNotFoundException;
-import com.example.scheduler.model.*;
+import com.example.scheduler.model.Appointment;
+import com.example.scheduler.model.AppointmentStatus;
+import com.example.scheduler.model.Provider;
+import com.example.scheduler.model.User;
 import com.example.scheduler.repository.SchedulerRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,48 +25,36 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public Appointment getAppointmentById(int id) {
-        return schedulerRepository.findById(id).orElseThrow(AppointmentNotFoundException::new);
+    public List<Appointment> getAllAppointmentByProvider(String providerId) {
+        return schedulerRepository.findAllByProvider_UserId(providerId);
     }
 
     @Override
-    public List<Appointment> getAppointmentsByCustomerId(int userId) {
-        return schedulerRepository.findByCustomer_Id(userId);
+    public Appointment getAppointmentById(int id, String providerId) {
+        return schedulerRepository.findByIdAndProvider_UserId(id, providerId).orElseThrow(AppointmentNotFoundException::new);
     }
 
     @Override
-    public List<Appointment> getAppointmentsByCustomerIdByDay(int userId, LocalDate day) {
-        return schedulerRepository.findByCustomer_IdAndDay(userId, day);
+    public List<Appointment> getAppointmentsByCustomerId(int customerId, String providerId) {
+        return schedulerRepository.findByCustomerIdAndProvider_UserId(customerId, providerId);
     }
 
     @Override
-    public List<Appointment> getAppointmentsByCustomerIdByStatus(int userId, AppointmentStatus status) {
-        return schedulerRepository.findByCustomer_IdAndStatus(userId, status);
+    public List<Appointment> getAppointmentsByCustomerIdByDay(int customerId, LocalDate day, String providerId) {
+        return schedulerRepository.findByCustomerIdAndDayAndProvider_UserId(customerId, day, providerId);
     }
 
     @Override
-    public List<Appointment> getAppointmentsByProviderId(int userId) {
-        return schedulerRepository.findByProvider_Id(userId);
-    }
-
-    @Override
-    public List<Appointment> getAppointmentsByProviderIdByDay(int userId, LocalDate day) {
-        return schedulerRepository.findByProvider_IdAndDay(userId, day);
-    }
-
-    @Override
-    public List<Appointment> getAppointmentsByProviderIdByStatus(int userId, AppointmentStatus status) {
-        return schedulerRepository.findByProvider_IdAndStatus(userId, status);
+    public List<Appointment> getAppointmentsByCustomerIdByStatus(int customerId, AppointmentStatus status, String providerId) {
+        return schedulerRepository.findByCustomerIdAndStatusAndProvider_UserId(customerId, status, providerId);
     }
 
     @Override
     public void createAppointment(AppointmentDto appointmentDto) {
         Appointment appointment = new Appointment();
-        User customerUser = userService.findUserById(appointmentDto.getUserId());
         User providerUser = userService.findUserById(appointmentDto.getProviderId());
-        Customer customer = createCustomer(customerUser);
         Provider provider = createProvider(providerUser);
-        appointment.setCustomer(customer);
+        appointment.setCustomerId(appointmentDto.getCustomerId());
         appointment.setProvider(provider);
         appointment.setDay(appointmentDto.getStart().toLocalDate());
         appointment.setStartTime(appointmentDto.getStart().toLocalTime());
@@ -82,16 +73,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     public void updateStatus(Appointment appointment, AppointmentStatus status) {
         appointment.setStatus(status);
         schedulerRepository.save(appointment);
-    }
-
-    private Customer createCustomer(User user) {
-        Customer customer = new Customer();
-        customer.setId(user.getId());
-        customer.setUsername(user.getUsername());
-        customer.setFirstName(user.getFirstName());
-        customer.setLastName(user.getLastName());
-        customer.setEmail(user.getEmail());
-        return customer;
     }
 
     private Provider createProvider(User user) {

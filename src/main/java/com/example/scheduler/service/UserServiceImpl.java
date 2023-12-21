@@ -1,5 +1,6 @@
 package com.example.scheduler.service;
 
+import com.example.scheduler.dto.CustomerDto;
 import com.example.scheduler.exception.UserNotFoundException;
 import com.example.scheduler.model.User;
 import com.example.scheduler.repository.UserRepository;

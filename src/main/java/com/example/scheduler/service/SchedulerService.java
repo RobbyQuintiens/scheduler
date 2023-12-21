@@ -10,13 +10,11 @@ import java.util.List;
 
 public interface SchedulerService {
 
-    public Appointment getAppointmentById(int id);
-    public List<Appointment> getAppointmentsByCustomerId(int userId);
-    public List<Appointment> getAppointmentsByCustomerIdByDay(int userId, LocalDate day);
-    public List<Appointment> getAppointmentsByCustomerIdByStatus(int userId, AppointmentStatus status);
-    public List<Appointment> getAppointmentsByProviderId(int userId);
-    public List<Appointment> getAppointmentsByProviderIdByDay(int userId, LocalDate day);
-    public List<Appointment> getAppointmentsByProviderIdByStatus(int userId, AppointmentStatus status);
+    public List<Appointment> getAllAppointmentByProvider(String providerId);
+    public Appointment getAppointmentById(int id, String providerId);
+    public List<Appointment> getAppointmentsByCustomerId(int customerId, String providerId);
+    public List<Appointment> getAppointmentsByCustomerIdByDay(int customerId, LocalDate day, String providerId);
+    public List<Appointment> getAppointmentsByCustomerIdByStatus(int customerId, AppointmentStatus status, String providerId);
     public void createAppointment(AppointmentDto appointmentDto);
     public void updateAppointment(Appointment appointment);
     public void updateStatus(Appointment appointment, AppointmentStatus status);

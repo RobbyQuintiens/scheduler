@@ -12,17 +12,13 @@ import java.util.Optional;
 @Repository
 public interface SchedulerRepository extends JpaRepository<Appointment, Integer> {
 
-    Optional<Appointment> findById(int id);
+    List<Appointment> findAllByProvider_UserId(String providerId);
 
-    List<Appointment> findByCustomer_Id(int userId);
+    Optional<Appointment> findByIdAndProvider_UserId(int id, String providerId);
 
-    List<Appointment> findByProvider_Id(int providerId);
+    List<Appointment> findByCustomerIdAndProvider_UserId(int userId, String providerId);
 
-    List<Appointment> findByCustomer_IdAndDay(int userId, LocalDate day);
+    List<Appointment> findByCustomerIdAndDayAndProvider_UserId(int userId, LocalDate day, String providerId);
 
-    List<Appointment> findByProvider_IdAndDay(int providerId, LocalDate day);
-
-    List<Appointment> findByCustomer_IdAndStatus(int userId, AppointmentStatus status);
-
-    List<Appointment> findByProvider_IdAndStatus(int providerId, AppointmentStatus status);
+    List<Appointment> findByCustomerIdAndStatusAndProvider_UserId(int userId, AppointmentStatus status, String providerId);
 }
