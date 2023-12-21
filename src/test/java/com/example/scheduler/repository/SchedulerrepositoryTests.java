@@ -1,6 +1,8 @@
 package com.example.scheduler.repository;
 
-import com.example.scheduler.model.*;
+import com.example.scheduler.model.Appointment;
+import com.example.scheduler.model.AppointmentStatus;
+import com.example.scheduler.model.Provider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -25,10 +27,10 @@ public class SchedulerrepositoryTests {
     @Test
     public void findByIdTest() {
         createAppointment();
-        Appointment foundAppointment = schedulerRepository.findById(appointment.getId()).get();
+        Appointment foundAppointment = schedulerRepository.findByIdAndProvider_UserId(appointment.getId(),
+                appointment.getProvider().getUserId()).get();
 
         assertThat(foundAppointment.getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.getCustomer().getUsername()).isEqualTo("user");
         assertThat(foundAppointment.getProvider().getUsername()).isEqualTo("provider");
         assertThat(foundAppointment.getStartTime()).isEqualTo(appointment.getStartTime());
         assertThat(foundAppointment.getEndTime()).isEqualTo(appointment.getEndTime());
@@ -39,10 +41,10 @@ public class SchedulerrepositoryTests {
     public void findByCustomerIdTest() {
         createAppointment();
         List<Appointment> foundAppointment = schedulerRepository
-                .findByCustomer_Id(appointment.getCustomer().getId());
+                .findByCustomerIdAndProvider_UserId(appointment.getCustomerId(),
+                        appointment.getProvider().getUserId());
 
         assertThat(foundAppointment.get(0).getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.get(0).getCustomer().getUsername()).isEqualTo("user");
         assertThat(foundAppointment.get(0).getProvider().getUsername()).isEqualTo("provider");
     }
 
@@ -50,10 +52,10 @@ public class SchedulerrepositoryTests {
     public void findByCustomerIdAndDayTest() {
         createAppointment();
         List<Appointment> foundAppointment = schedulerRepository
-                .findByCustomer_IdAndDay(appointment.getCustomer().getId(), LocalDate.now());
+                .findByCustomerIdAndDayAndProvider_UserId(appointment.getCustomerId(), LocalDate.now(),
+                        appointment.getProvider().getUserId());
 
         assertThat(foundAppointment.get(0).getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.get(0).getCustomer().getUsername()).isEqualTo("user");
         assertThat(foundAppointment.get(0).getProvider().getUsername()).isEqualTo("provider");
     }
 
@@ -61,50 +63,25 @@ public class SchedulerrepositoryTests {
     public void findByCustomerIdAndStatusTest() {
         createAppointment();
         List<Appointment> foundAppointment = schedulerRepository
-                .findByCustomer_IdAndStatus(appointment.getCustomer().getId(), AppointmentStatus.SCHEDULED);
+                .findByCustomerIdAndStatusAndProvider_UserId(appointment.getCustomerId(), AppointmentStatus.SCHEDULED,
+                        appointment.getProvider().getUserId());
 
         assertThat(foundAppointment.get(0).getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.get(0).getCustomer().getUsername()).isEqualTo("user");
         assertThat(foundAppointment.get(0).getProvider().getUsername()).isEqualTo("provider");
     }
 
     @Test
-    public void findByProviderIdTest() {
+    public void findAllByProviderId() {
         createAppointment();
         List<Appointment> foundAppointment = schedulerRepository
-                .findByProvider_Id(appointment.getProvider().getId());
+                .findAllByProvider_UserId(appointment.getProvider().getUserId());
 
         assertThat(foundAppointment.get(0).getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.get(0).getCustomer().getUsername()).isEqualTo("user");
-        assertThat(foundAppointment.get(0).getProvider().getUsername()).isEqualTo("provider");
-    }
-
-    @Test
-    public void findByProviderIdAndDayTest() {
-        createAppointment();
-        List<Appointment> foundAppointment = schedulerRepository
-                .findByProvider_IdAndDay(appointment.getProvider().getId(), LocalDate.now());
-
-        assertThat(foundAppointment.get(0).getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.get(0).getCustomer().getUsername()).isEqualTo("user");
-        assertThat(foundAppointment.get(0).getProvider().getUsername()).isEqualTo("provider");
-    }
-
-    @Test
-    public void findByProviderIdAndStatusTest() {
-        createAppointment();
-        List<Appointment> foundAppointment = schedulerRepository
-                .findByProvider_IdAndStatus(appointment.getProvider().getId(), AppointmentStatus.SCHEDULED);
-
-        assertThat(foundAppointment.get(0).getTitle()).isEqualTo("Title");
-        assertThat(foundAppointment.get(0).getCustomer().getUsername()).isEqualTo("user");
         assertThat(foundAppointment.get(0).getProvider().getUsername()).isEqualTo("provider");
     }
 
     private void createAppointment() {
-        Customer customer = createCustomer(1, "user");
         Provider provider = createProvider(2, "provider");
-        userRepository.save(customer);
         userRepository.save(provider);
         appointment = new Appointment();
         appointment.setId(1);
@@ -112,20 +89,10 @@ public class SchedulerrepositoryTests {
         appointment.setStatus(AppointmentStatus.SCHEDULED);
         appointment.setStartTime(LocalTime.now());
         appointment.setEndTime(LocalTime.now().plusHours(1));
-        appointment.setCustomer(customer);
+        appointment.setCustomerId(1);
         appointment.setProvider(provider);
         appointment.setDay(LocalDate.now());
         schedulerRepository.save(appointment);
-    }
-
-    private Customer createCustomer(int id, String username) {
-        Customer customer = new Customer();
-        customer.setId(id);
-        customer.setUserId("11");
-        customer.setUsername(username);
-        customer.setFirstName("firstName");
-        customer.setLastName("lastName");
-        return customer;
     }
 
     private Provider createProvider(int id, String username) {

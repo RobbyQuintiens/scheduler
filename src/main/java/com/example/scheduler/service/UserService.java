@@ -1,5 +1,6 @@
 package com.example.scheduler.service;
 
+import com.example.scheduler.dto.CustomerDto;
 import com.example.scheduler.model.User;
 
 import java.util.Optional;

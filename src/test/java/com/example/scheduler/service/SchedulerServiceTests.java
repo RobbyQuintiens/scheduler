@@ -1,6 +1,8 @@
 package com.example.scheduler.service;
 
-import com.example.scheduler.model.*;
+import com.example.scheduler.model.Appointment;
+import com.example.scheduler.model.AppointmentStatus;
+import com.example.scheduler.model.Provider;
 import com.example.scheduler.repository.SchedulerRepository;
 import com.example.scheduler.repository.UserRepository;
 import org.junit.Test;
@@ -34,9 +36,9 @@ public class SchedulerServiceTests {
     @Test
     public void getAppointmentByIdTest() {
         Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.CONFIRMED, START_TIME);
-        when(schedulerRepository.findById(1)).thenReturn(Optional.of(appointment));
+        when(schedulerRepository.findByIdAndProvider_UserId(1, appointment.getProvider().getUserId())).thenReturn(Optional.of(appointment));
 
-        Appointment foundAppointment = schedulerService.getAppointmentById(1);
+        Appointment foundAppointment = schedulerService.getAppointmentById(1, appointment.getProvider().getUserId());
 
         assertThat(foundAppointment.getTitle()).isEqualTo("appointment title");
     }
@@ -44,12 +46,10 @@ public class SchedulerServiceTests {
     @Test
     public void getAppointmentsByCustomerIdTest() {
         Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.CONFIRMED, START_TIME);
-        Customer customer = createCustomer(1, "user");
-        appointment.setCustomer(customer);
 
-        when(schedulerRepository.findByCustomer_Id(1)).thenReturn(singletonList(appointment));
+        when(schedulerRepository.findByCustomerIdAndProvider_UserId(1, appointment.getProvider().getUserId())).thenReturn(singletonList(appointment));
 
-        List<Appointment> foundAppointments = schedulerService.getAppointmentsByCustomerId(1);
+        List<Appointment> foundAppointments = schedulerService.getAppointmentsByCustomerId(1, appointment.getProvider().getUserId());
 
         assertThat(foundAppointments.get(0).getTitle()).isEqualTo("appointment title");
     }
@@ -57,14 +57,12 @@ public class SchedulerServiceTests {
     @Test
     public void getAppointmentsByUserIdByDayTest() {
         Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.CONFIRMED, START_TIME);
-        Customer customer = createCustomer(1, "user");
-        appointment.setCustomer(customer);
 
-        when(schedulerRepository.findByCustomer_IdAndDay(1, LocalDate.now()))
+        when(schedulerRepository.findByCustomerIdAndDayAndProvider_UserId(1, LocalDate.now(), appointment.getProvider().getUserId()))
                 .thenReturn(singletonList(appointment));
 
-        List<Appointment> foundAppointments = schedulerService.getAppointmentsByCustomerIdByDay(customer.getId(),
-                appointment.getDay());
+        List<Appointment> foundAppointments = schedulerService.getAppointmentsByCustomerIdByDay(appointment.getCustomerId(),
+                appointment.getDay(), appointment.getProvider().getUserId());
 
         assertThat(foundAppointments.get(0).getTitle()).isEqualTo("appointment title");
     }
@@ -72,57 +70,12 @@ public class SchedulerServiceTests {
     @Test
     public void getAppointmentsByUserIdByStatusTest() {
         Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.SCHEDULED, START_TIME);
-        Customer customer = createCustomer(1, "user");
-        appointment.setCustomer(customer);
 
-        when(schedulerRepository.findByCustomer_IdAndStatus(1,
-                AppointmentStatus.SCHEDULED)).thenReturn(singletonList(appointment));
+        when(schedulerRepository.findByCustomerIdAndStatusAndProvider_UserId(1,
+                AppointmentStatus.SCHEDULED, appointment.getProvider().getUserId())).thenReturn(singletonList(appointment));
 
-        List<Appointment> foundAppointments = schedulerService.getAppointmentsByCustomerIdByStatus(customer.getId(),
-                AppointmentStatus.SCHEDULED);
-
-        assertThat(foundAppointments.get(0).getTitle()).isEqualTo("appointment title");
-    }
-
-    @Test
-    public void getAppointmentsByProviderIdTest() {
-        Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.CONFIRMED, START_TIME);
-        Provider provider = createProvider(1, "provider");
-        appointment.setProvider(provider);
-
-        when(schedulerRepository.findByProvider_Id(1)).thenReturn(singletonList(appointment));
-
-        List<Appointment> foundAppointments = schedulerService.getAppointmentsByProviderId(provider.getId());
-
-        assertThat(foundAppointments.get(0).getTitle()).isEqualTo("appointment title");
-    }
-
-    @Test
-    public void getAppointmentsByProviderIdByDayTest() {
-        Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.CONFIRMED, START_TIME);
-        Provider provider = createProvider(1, "provider");
-        appointment.setProvider(provider);
-
-        when(schedulerRepository.findByProvider_IdAndDay(1, LocalDate.now()))
-                .thenReturn(singletonList(appointment));
-
-        List<Appointment> foundAppointments = schedulerService.getAppointmentsByProviderIdByDay(provider.getId(),
-                appointment.getDay());
-
-        assertThat(foundAppointments.get(0).getTitle()).isEqualTo("appointment title");
-    }
-
-    @Test
-    public void getAppointmentsByProviderIdByStatusTest() {
-        Appointment appointment = createAppointment(1, "appointment title", AppointmentStatus.SCHEDULED, START_TIME);
-        Provider provider = createProvider(1, "provider");
-        appointment.setProvider(provider);
-
-        when(schedulerRepository.findByProvider_IdAndStatus(1,
-                AppointmentStatus.SCHEDULED)).thenReturn(singletonList(appointment));
-
-        List<Appointment> foundAppointments = schedulerService.getAppointmentsByProviderIdByStatus(provider.getId(),
-                AppointmentStatus.SCHEDULED);
+        List<Appointment> foundAppointments = schedulerService.getAppointmentsByCustomerIdByStatus(appointment.getCustomerId(),
+                AppointmentStatus.SCHEDULED, appointment.getProvider().getUserId());
 
         assertThat(foundAppointments.get(0).getTitle()).isEqualTo("appointment title");
     }
@@ -145,17 +98,9 @@ public class SchedulerServiceTests {
         appointment.setStartTime(start);
         appointment.setEndTime(start.plusHours(1));
         appointment.setDay(LocalDate.now());
+        appointment.setCustomerId(1);
+        appointment.setProvider(createProvider(1, "provider"));
         return appointment;
-    }
-
-    private Customer createCustomer(int id, String username) {
-        Customer customer = new Customer();
-        customer.setId(id);
-        customer.setUserId("11");
-        customer.setUsername(username);
-        customer.setFirstName("firstName");
-        customer.setLastName("lastName");
-        return customer;
     }
 
     private Provider createProvider(int id, String username) {
@@ -167,16 +112,4 @@ public class SchedulerServiceTests {
         provider.setLastName("lastName");
         return provider;
     }
-
-    private Address createAddress() {
-        Address address = new Address();
-        address.setId(1);
-        address.setCity("City");
-        address.setStreet("Street");
-        address.setNumber("1b");
-        address.setZipCode("3500");
-        address.setCountry("Belgium");
-        return address;
-    }
-
 }
