@@ -24,7 +24,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run the application using the Java 11 JRE
-FROM eclipse-temurin:11-jre-slim
+FROM eclipse-temurin:11-jre
 
 # Set the working directory for the runtime
 WORKDIR /app
