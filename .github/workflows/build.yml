@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to GitHub Packages
+name: Build and Push Docker Image
 
 on:
   push:
@@ -27,19 +27,15 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/scheduler:${{ github.ref }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/service:${{ github.sha }} .
 
-      - name: Build Docker image
+      - name: Log in to Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          BRANCH_NAME=${{ github.ref }}
-          BRANCH_NAME=${BRANCH_NAME#refs/heads/} # Remove 'refs/heads/' prefix
-          TAG=${BRANCH_NAME//[^a-zA-Z0-9_.-]/-} # Replace invalid characters with '-'
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/scheduler:${TAG} .
+          echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
 
       - name: Push Docker image
         run: |
-          BRANCH_NAME=${{ github.ref }}
-          BRANCH_NAME=${BRANCH_NAME#refs/heads/} # Remove 'refs/heads/' prefix
-          TAG=${BRANCH_NAME//[^a-zA-Z0-9_.-]/-} # Replace invalid characters with '-'
-          docker push ${{ secrets.DOCKER_USERNAME }}/scheduler:${TAG}
-
+          docker push ${{ secrets.DOCKER_USERNAME }}/service:${{ github.sha }}
