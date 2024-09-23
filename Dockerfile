@@ -1,6 +1,7 @@
 # Stage 1: Build the application
 FROM eclipse-temurin:11-jdk-slim AS build
 
+# Install maven
 RUN apt-get update && apt-get install -y wget \
     && wget https://archive.apache.org/dist/maven/maven-3/3.1.5/binaries/apache-maven-3.1.5-bin.tar.gz \
     && tar xzf apache-maven-3.1.5-bin.tar.gz -C /opt \
