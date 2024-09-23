@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM eclipse-temurin:11-jdk-slim AS build
+FROM eclipse-temurin:11-jdk AS build
 
 # Install maven
 RUN apt-get update && apt-get install -y wget \
