@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - oc
+      - main
   pull_request:
     branches:
       - oc
+      - main
 
 jobs:
   build:
@@ -27,7 +29,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/scheduler:latest .
+          BRANCH_NAME=${{ github.event.ref }}
+          BRANCH_NAME=${BRANCH_NAME#refs/heads/} # Remove 'refs/heads/' prefix
+          TAG=${BRANCH_NAME//[^a-zA-Z0-9_.-]/-} # Replace invalid characters with '-'
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            TAG="latest"
+          fi
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/scheduler:${TAG} .
 
       - name: Log in to Docker Hub
         env:
@@ -38,4 +46,10 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/scheduler:latest
+          BRANCH_NAME=${{ github.event.ref }}
+          BRANCH_NAME=${BRANCH_NAME#refs/heads/} # Remove 'refs/heads/' prefix
+          TAG=${BRANCH_NAME//[^a-zA-Z0-9_.-]/-} # Replace invalid characters with '-'
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            TAG="latest"
+          fi
+          docker push ${{ secrets.DOCKER_USERNAME }}/scheduler:${TAG}
