@@ -3,10 +3,10 @@ FROM eclipse-temurin:11-jdk AS build
 
 # Install maven
 RUN apt-get update && apt-get install -y wget \
-    && wget https://archive.apache.org/dist/maven/maven-3/3.1.5/binaries/apache-maven-3.1.5-bin.tar.gz \
-    && tar xzf apache-maven-3.1.5-bin.tar.gz -C /opt \
-    && ln -s /opt/apache-maven-3.1.5/bin/mvn /usr/bin/mvn \
-    && rm apache-maven-3.1.5-bin.tar.gz
+    && wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz \
+    && tar xzf apache-maven-3.6.3-bin.tar.gz -C /opt \
+    && ln -s /opt/apache-maven-3.6.3/bin/mvn /usr/bin/mvn \
+    && rm apache-maven-3.6.3-bin.tar.gz
 
 # Set the working directory inside the container
 WORKDIR /app
