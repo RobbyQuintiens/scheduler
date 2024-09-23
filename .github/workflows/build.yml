@@ -3,10 +3,10 @@ name: Build and Push Docker Image to GitHub Packages
 on:
   push:
     branches:
-      - '**'
+      - oc
   pull_request:
     branches:
-      - '**'
+      - oc
 
 jobs:
   build:
