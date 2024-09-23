@@ -1,12 +1,12 @@
 package com.example.scheduler.filter;
 
-import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.List;
 
 @Component
@@ -31,11 +31,28 @@ public class UserDetailsFilter {
         return info;
     }
 
-    private static JSONObject decodeJWT(String JWTToken) {
-        String[] splitString = JWTToken.split("\\.");
-        String base64EncodedBody = splitString[1];
-        Base64 base64Url = new Base64(true);
-        String body = new String(base64Url.decode(base64EncodedBody));
-        return new JSONObject(body);
+    private static JSONObject decodeJWT(String jwtToken) {
+        try {
+            String[] splitString = jwtToken.split("\\.");
+            if (splitString.length != 3) {
+                throw new IllegalArgumentException("Invalid JWT token format");
+            }
+
+            String base64EncodedBody = splitString[1];
+            // Replace URL-safe characters
+            String base64 = base64EncodedBody.replace('-', '+').replace('_', '/');
+            // Add padding if necessary
+            int padding = 4 - (base64.length() % 4);
+            if (padding < 4) {
+                base64 += "=".repeat(padding);
+            }
+
+            // Decode the Base64-encoded string
+            byte[] decodedBytes = Base64.getDecoder().decode(base64);
+            String body = new String(decodedBytes);
+            return new JSONObject(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to decode JWT token", e);
+        }
     }
 }
