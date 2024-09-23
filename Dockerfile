@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Copy the Maven project file and download dependencies (caches dependencies)
 COPY pom.xml .
-
 # Download dependencies
 RUN mvn dependency:resolve
 
