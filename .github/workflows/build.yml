@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/scheduler-service:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/scheduler:latest .
 
       - name: Log in to Docker Hub
         env:
@@ -38,4 +38,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/scheduler-service:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/scheduler:latest
